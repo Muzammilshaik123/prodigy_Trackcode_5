@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: url('https://wallpapercave.com/wp/wp10154404.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .weather-container {
+            text-align: center;
+            color: #fff;
+        }
+
+        .weather-info {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        button {
+            background: #1976D2;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        input {
+            padding: 8px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="weather-container">
+        <div class="weather-info" id="weatherInfo">
+            <h2>Loading...</h2>
+        </div>
+        <label for="apiKey">API Key:</label>
+        <input type="text" id="apiKey" placeholder="Enter your API key">
+        <button onclick="getLocation()">Get Weather</button>
+    </div>
+
+    <script>
+        function getLocation() {
+            const apiKey = document.getElementById('apiKey').value;
+
+            if (!apiKey) {
+                alert('Please enter your API key.');
+                return;
+            }
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => getWeatherData(position, apiKey));
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        function getWeatherData(position, apiKey) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`;
+
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    displayWeatherData(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching weather data:', error);
+                });
+        }
+
+        function displayWeatherData(data) {
+            const weatherInfoElement = document.getElementById('weatherInfo');
+            const temperature = data.main.temp;
+            const description = data.weather[0].description;
+
+            weatherInfoElement.innerHTML = `
+                <h2>Current Weather</h2>
+                <p>Temperature: ${temperature} °C</p>
+                <p>Description: ${description}</p>
+            `;
+        }
+    </script>
+</body>
+</html>
